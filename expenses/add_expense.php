@@ -108,7 +108,7 @@ require_once '../includes/navbar.php';
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Add Expense</button>
+        <button type="submit" class="btn btn-primary">Add Crop</button>
         <a href="manage_expenses.php" class="btn btn-secondary">Cancel</a>
       </div>
     </form>

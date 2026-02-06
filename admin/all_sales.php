@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Check if user is logged in and is admin
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php');
     exit;
@@ -12,7 +11,7 @@ require_once '../config/db_connection.php';
 $user_id = $_SESSION['user_id'];
 
 // Check if user is admin
-$admin_check = "SELECT is_admin FROM users WHERE id = ?";
+$admin_check = "SELECT is_admin, name FROM users WHERE id = ?";
 $stmt = mysqli_prepare($conn, $admin_check);
 mysqli_stmt_bind_param($stmt, 'i', $user_id);
 mysqli_stmt_execute($stmt);
@@ -23,6 +22,8 @@ if (!$user || $user['is_admin'] != 1) {
     header('Location: ../dashboard/index.php');
     exit;
 }
+
+$user_name = $user['name'] ?? 'Admin';
 ?>
 
 <!DOCTYPE html>
@@ -33,165 +34,418 @@ if (!$user || $user['is_admin'] != 1) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Sales - CropManage Admin</title>
     <link rel="stylesheet" href="../assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #2d5016;
-            --primary-light: #4a7c27;
-            --secondary: #8bc34a;
-        }
-
-        .admin-nav {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            padding: 1rem 2rem;
-            margin-bottom: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(45, 80, 22, 0.2);
-        }
-
-        .admin-nav h2 {
-            color: white;
-            margin: 0 0 1rem 0;
-        }
-
-        .admin-nav ul {
-            list-style: none;
-            padding: 0;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f8f9fa;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            min-height: 100vh;
             display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
+            flex-direction: column;
         }
 
-        .admin-nav ul li a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-
-        .admin-nav ul li a:hover,
-        .admin-nav ul li a.active {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        h1 {
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
+        /* Admin Navigation */
+        .admin-navbar {
             background: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .data-table th,
-        .data-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+        .admin-navbar-row {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .data-table th {
-            background: var(--primary);
+        .admin-navbar-row+.admin-navbar-row {
+            border-top: 1px solid #e9ecef;
+            padding: 0;
+        }
+
+        .admin-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .admin-brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c27 100%);
             color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 2px 6px rgba(45, 80, 22, 0.2);
+        }
+
+        .admin-brand-text h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .admin-brand-text span {
+            font-size: 0.75rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #f8f9fa;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            border: 1px solid #e9ecef;
+        }
+
+        .admin-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c27 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .admin-user-info strong {
+            display: block;
+            font-size: 0.9rem;
+            color: #1a1a1a;
             font-weight: 600;
         }
 
-        .data-table tr:hover {
-            background: rgba(139, 195, 74, 0.05);
+        .admin-user-info span {
+            display: block;
+            font-size: 0.75rem;
+            color: #6c757d;
         }
 
-        .data-table tfoot tr {
-            background: rgba(139, 195, 74, 0.1);
-            font-weight: bold;
+        .admin-nav-menu {
+            list-style: none;
+            display: flex;
+            width: 100%;
+            margin: 0;
+            padding: 0;
         }
 
-        .empty-message {
-            text-align: center;
-            padding: 2rem;
-            color: #666;
+        .admin-nav-menu li {
+            flex: 1;
+        }
+
+        .admin-nav-menu a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 1rem;
+            text-decoration: none;
+            color: #495057;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .admin-nav-menu a:hover {
+            color: #2d5016;
+            background: #f8f9fa;
+            border-bottom-color: #2d5016;
+        }
+
+        .admin-nav-menu a.active {
+            color: #2d5016;
+            background: #f1f8e9;
+            border-bottom-color: #2d5016;
+            font-weight: 600;
+        }
+
+        .admin-nav-menu a i {
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .content-wrapper {
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2.5rem 2.5rem;
+        }
+
+        .page-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .page-header h2 {
+            color: #1a1a1a;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+
+        .table-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .table-wrapper {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e9ecef;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 1.1rem 1.5rem;
+            text-align: left;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #495057;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        td {
+            padding: 1.2rem 1.5rem;
+            font-size: 0.95rem;
+            color: #495057;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        td strong {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        tfoot tr {
+            background: #f8f9fa;
+            font-weight: 700;
+        }
+
+        tfoot td {
+            color: #1a1a1a;
+            font-weight: 700;
+            border-bottom: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            color: #dee2e6;
+            margin-bottom: 1.2rem;
+        }
+
+        .empty-state h4 {
+            color: #495057;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 1024px) {
+
+            .admin-navbar-row,
+            .content-wrapper {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-navbar-row {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .admin-nav-menu {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .admin-nav-menu a {
+                justify-content: flex-start;
+                padding: 1rem 1.5rem;
+                border-bottom: 1px solid #e9ecef;
+                border-bottom-width: 1px;
+            }
+
+            .content-wrapper {
+                padding: 1.5rem 1rem;
+            }
+
+            .page-header h2 {
+                font-size: 1.6rem;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            th,
+            td {
+                padding: 0.9rem 1rem;
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <nav class="admin-nav">
-        <h2>Admin Panel</h2>
-        <ul>
-            <li><a href="dashboard.php">Dashboard</a></li>
-            <li><a href="users.php">Manage Users</a></li>
-            <li><a href="all_crops.php">All Crops</a></li>
-            <li><a href="all_expenses.php">All Expenses</a></li>
-            <li><a href="all_sales.php" class="active">All Sales</a></li>
-            <li><a href="../auth/logout.php">Logout</a></li>
-        </ul>
+    <nav class="admin-navbar">
+        <div class="admin-navbar-row">
+            <div class="admin-brand">
+                <div class="admin-brand-icon">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+                <div class="admin-brand-text">
+                    <h1>CropManage</h1>
+                    <span>Admin Panel</span>
+                </div>
+            </div>
+
+            <div class="admin-user">
+                <div class="admin-avatar">
+                    <?php echo strtoupper(substr($user_name, 0, 1)); ?>
+                </div>
+                <div class="admin-user-info">
+                    <strong><?php echo htmlspecialchars($user_name); ?></strong>
+                    <span>Administrator</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-navbar-row">
+            <ul class="admin-nav-menu">
+                <li><a href="dashboard.php"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="users.php"><i class="fa-solid fa-users"></i> Users</a></li>
+                <li><a href="all_crops.php"><i class="fa-solid fa-leaf"></i> Crops</a></li>
+                <li><a href="all_expenses.php"><i class="fa-solid fa-wallet"></i> Expenses</a></li>
+                <li><a href="all_sales.php" class="active"><i class="fa-solid fa-cart-shopping"></i> Sales</a></li>
+                <li><a href="../auth/logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+            </ul>
+        </div>
     </nav>
 
-    <div class="container">
-        <main>
-            <h1>All Sales Overview</h1>
+    <div class="content-wrapper">
+        <div class="page-header">
+            <h2>All Sales Overview</h2>
+            <p>Complete list of all sales recorded across all farmers</p>
+        </div>
 
-            <?php
-            $sales_query = "SELECT s.*, u.name as farmer_name, c.crop_name 
-                           FROM sales s 
-                           JOIN users u ON s.user_id = u.id 
-                           JOIN crops c ON s.crop_id = c.id 
-                           ORDER BY s.sale_date DESC";
-            $sales_result = mysqli_query($conn, $sales_query);
+        <div class="table-section">
+            <div class="table-wrapper">
+                <?php
+                $sales_query = "SELECT s.*, u.name as farmer_name, c.crop_name 
+                               FROM sales s 
+                               JOIN users u ON s.user_id = u.id 
+                               JOIN crops c ON s.crop_id = c.id 
+                               ORDER BY s.sale_date DESC";
+                $sales_result = mysqli_query($conn, $sales_query);
 
-            if (mysqli_num_rows($sales_result) > 0):
-                $total_sales = 0;
-            ?>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Farmer</th>
-                            <th>Crop</th>
-                            <th>Quantity</th>
-                            <th>Price/Unit</th>
-                            <th>Total Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($sale = mysqli_fetch_assoc($sales_result)):
-                            $total_sales += $sale['total_amount'];
-                        ?>
+                if (mysqli_num_rows($sales_result) > 0):
+                    $total_sales = 0;
+                ?>
+                    <table>
+                        <thead>
                             <tr>
-                                <td><?php echo date('M d, Y', strtotime($sale['sale_date'])); ?></td>
-                                <td><?php echo htmlspecialchars($sale['farmer_name']); ?></td>
-                                <td><?php echo htmlspecialchars($sale['crop_name']); ?></td>
-                                <td><?php echo $sale['quantity_sold'] . ' ' . $sale['quantity_unit']; ?></td>
-                                <td>Rs. <?php echo number_format($sale['price_per_unit'], 2); ?></td>
-                                <td>Rs. <?php echo number_format($sale['total_amount'], 2); ?></td>
+                                <th>Date</th>
+                                <th>Farmer</th>
+                                <th>Crop</th>
+                                <th>Quantity</th>
+                                <th>Price/Unit</th>
+                                <th>Total Amount</th>
                             </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="5" style="text-align: right; color: var(--primary);">Total Sales:</td>
-                            <td style="color: var(--primary);">Rs. <?php echo number_format($total_sales, 2); ?></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            <?php else: ?>
-                <p class="empty-message">No sales records found.</p>
-            <?php endif; ?>
-        </main>
+                        </thead>
+                        <tbody>
+                            <?php while ($sale = mysqli_fetch_assoc($sales_result)):
+                                $total_sales += $sale['total_amount'];
+                            ?>
+                                <tr>
+                                    <td><?php echo date('M d, Y', strtotime($sale['sale_date'])); ?></td>
+                                    <td><strong><?php echo htmlspecialchars($sale['farmer_name']); ?></strong></td>
+                                    <td><?php echo htmlspecialchars($sale['crop_name']); ?></td>
+                                    <td><?php echo $sale['quantity_sold'] . ' ' . $sale['quantity_unit']; ?></td>
+                                    <td>₹<?php echo number_format($sale['price_per_unit'], 2); ?></td>
+                                    <td><strong>₹<?php echo number_format($sale['total_amount'], 2); ?></strong></td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" style="text-align: right;">Total Sales:</td>
+                                <td>₹<?php echo number_format($total_sales, 2); ?></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <h4>No Sales Records Found</h4>
+                        <p>Sales records will appear here once farmers start recording them</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 
-    <footer style="margin-top: 3rem; padding: 2rem; text-align: center; background: #f5f5f5; border-top: 1px solid #ddd;">
-        <p>&copy; <?php echo date('Y'); ?> CropManage. All rights reserved.</p>
-    </footer>
-
+    <?php require_once '../includes/footer.php'; ?>
 </body>
 
 </html>

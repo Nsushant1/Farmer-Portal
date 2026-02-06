@@ -14,8 +14,12 @@ require_once '../includes/navbar.php';
         <p>Track and manage your crops efficiently</p>
       </div>
       <div class="quick-actions">
-        <a href="../crops/add_crop.php" class="btn btn-success">+ Add New Crop</a>
-        <a href="../expenses/add_expense.php" class="btn btn-primary">+ Add Expense</a>
+        <a href="../crops/add_crop.php" class="btn btn-success">
+          <i class="fa fa-plus-circle"></i> Add New Crop
+        </a>
+        <a href="../expenses/add_expense.php" class="btn btn-primary">
+          <i class="fa fa-plus-circle"></i> Add Expense
+        </a>
       </div>
     </section>
 
@@ -50,40 +54,60 @@ require_once '../includes/navbar.php';
       ?>
 
       <div class="stat-card">
-        <div class="stat-icon">📊</div>
+        <div class="stat-icon-wrapper" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <i class="fa fa-leaf"></i>
+        </div>
         <div class="stat-content">
-          <h3>Total Crops</h3>
-          <p class="stat-value"><?php echo $crops_data['total_crops'] ?? 0; ?></p>
+          <h3 style="color: #666; font-weight: 600; font-size: 13px;">Total Crops</h3>
+          <p class="stat-value" style="color: #333; font-size: 32px; font-weight: 700; margin: 5px 0 0 0;">
+            <?php echo $crops_data['total_crops'] ?? 0; ?>
+          </p>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">💰</div>
+        <div class="stat-icon-wrapper" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+          <i class="fa fa-wallet"></i>
+        </div>
         <div class="stat-content">
-          <h3>Total Expenses</h3>
-          <p class="stat-value">Rs. <?php echo number_format($expenses_data['total_expenses'] ?? 0, 2); ?></p>
+          <h3 style="color: #666; font-weight: 600; font-size: 13px;">Total Expenses</h3>
+          <p class="stat-value" style="color: #333; font-size: 28px; font-weight: 700; margin: 5px 0 0 0;">
+            Rs. <?php echo number_format($expenses_data['total_expenses'] ?? 0, 2); ?>
+          </p>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">🌱</div>
+        <div class="stat-icon-wrapper" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+          <i class="fa fa-seedling"></i>
+        </div>
         <div class="stat-content">
-          <h3>Active Crops</h3>
-          <p class="stat-value"><?php echo $active_data['active_crops'] ?? 0; ?></p>
+          <h3 style="color: #666; font-weight: 600; font-size: 13px;">Active Crops</h3>
+          <p class="stat-value" style="color: #333; font-size: 32px; font-weight: 700; margin: 5px 0 0 0;">
+            <?php echo $active_data['active_crops'] ?? 0; ?>
+          </p>
         </div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">📈</div>
+        <div class="stat-icon-wrapper" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+          <i class="fa fa-chart-line"></i>
+        </div>
         <div class="stat-content">
-          <h3>Quick Actions</h3>
-          <p><a href="../reports/generate_report.php" class="action-link">Generate Report</a></p>
+          <h3 style="color: #666; font-weight: 600; font-size: 13px;">Quick Actions</h3>
+          <p style="margin: 5px 0 0 0;">
+            <a href="../reports/generate_report.php" class="action-link" style="color: #38f9d7; font-weight: 600; text-decoration: none; font-size: 14px;">
+              <i class="fa fa-file-alt" style="margin-right: 5px;"></i> Generate Report
+            </a>
+          </p>
         </div>
       </div>
     </section>
 
     <section class="recent-crops">
-      <h2>Recent Crops</h2>
+      <h2 style="color: #333; font-weight: 600; font-size: 22px; margin-bottom: 20px;">
+        <i class="fa fa-history" style="color: #667eea; margin-right: 8px;"></i> Recent Crops
+      </h2>
       <?php
       $recent_query = "SELECT * FROM crops WHERE user_id = ? ORDER BY created_at DESC LIMIT 5";
       $stmt = mysqli_prepare($conn, $recent_query);
@@ -97,23 +121,23 @@ require_once '../includes/navbar.php';
           <table class="data-table">
             <thead>
               <tr>
-                <th>Crop Name</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Planted</th>
+                <th style="color: #333; font-size: 14px;"><i class="fa fa-leaf" style="margin-right: 5px; color: #667eea;"></i> Crop Name</th>
+                <th style="color: #333; font-size: 14px;"><i class="fa fa-tag" style="margin-right: 5px; color: #667eea;"></i> Type</th>
+                <th style="color: #333; font-size: 14px;"><i class="fa fa-info-circle" style="margin-right: 5px; color: #667eea;"></i> Status</th>
+                <th style="color: #333; font-size: 14px;"><i class="fa fa-calendar" style="margin-right: 5px; color: #667eea;"></i> Planted</th>
               </tr>
             </thead>
             <tbody>
               <?php while ($crop = mysqli_fetch_assoc($recent_result)): ?>
                 <tr>
-                  <td><?php echo htmlspecialchars($crop['crop_name']); ?></td>
-                  <td><?php echo htmlspecialchars($crop['crop_type']); ?></td>
+                  <td style="color: #333; font-weight: 500;"><?php echo htmlspecialchars($crop['crop_name']); ?></td>
+                  <td style="color: #666;"><?php echo htmlspecialchars($crop['crop_type']); ?></td>
                   <td>
                     <span class="badge badge-<?php echo strtolower($crop['status']); ?>">
                       <?php echo ucfirst($crop['status']); ?>
                     </span>
                   </td>
-                  <td><?php echo date('M d, Y', strtotime($crop['planting_date'])); ?></td>
+                  <td style="color: #666;"><?php echo date('M d, Y', strtotime($crop['planting_date'])); ?></td>
                 </tr>
               <?php endwhile; ?>
             </tbody>
@@ -121,12 +145,43 @@ require_once '../includes/navbar.php';
         </div>
       <?php
       else:
-        echo '<p class="empty-message">No crops yet. <a href="../crops/add_crop.php">Add your first crop</a></p>';
+        echo '<p class="empty-message" style="color: #666; padding: 30px; text-align: center;">
+                <i class="fa fa-info-circle" style="margin-right: 5px;"></i> No crops yet. 
+                <a href="../crops/add_crop.php" style="color: #667eea; font-weight: 600;">
+                  <i class="fa fa-plus-circle" style="margin-left: 5px;"></i> Add your first crop
+                </a>
+              </p>';
       endif;
       mysqli_stmt_close($stmt);
       ?>
     </section>
   </main>
 </div>
+
+<style>
+  .stat-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .stat-icon-wrapper i {
+    font-size: 22px;
+    color: white;
+  }
+
+  .stat-card {
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  }
+</style>
 
 <?php require_once '../includes/footer.php'; ?>

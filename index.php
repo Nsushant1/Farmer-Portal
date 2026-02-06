@@ -7,6 +7,7 @@ $base_path = '';
 require_once 'includes/header.php';
 require_once 'includes/navbar-landing.php';
 ?>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <!-- Hero Section -->
 <section class="hero">
@@ -27,27 +28,32 @@ require_once 'includes/navbar-landing.php';
 <!-- Features Section -->
 <section class="features" id="features">
   <div class="features-container">
-    <h2 class="section-title">Why Choose CropManage?</h2>
+    <h2 class="section-title">Why Choose <span class="highlight">CropManage?</span></h2>
     <div class="features-grid">
       <div class="feature-card">
-        <div class="feature-icon">🌾</div>
+        <div class="feature-icon crop-icon">
+          <i class="fa fa-leaf"></i>
+        </div>
         <h3>Crop Management</h3>
         <p>Easily add, track, and manage all your crops in one centralized location</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">💰</div>
+        <div class="feature-icon expense-icon">
+          <i class="fa fa-money"></i>
+        </div>
         <h3>Expense Tracking</h3>
         <p>Monitor all expenses related to your crops and analyze spending patterns</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">📊</div>
+        <div class="feature-icon report-icon">
+          <i class="fa fa-bar-chart"></i>
+        </div>
         <h3>Detailed Reports</h3>
         <p>Generate comprehensive CSV reports for analysis and record keeping</p>
       </div>
     </div>
   </div>
 </section>
-
 <!-- CTA Section -->
 <section class="cta" id="about">
   <div class="cta-content">

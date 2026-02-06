@@ -116,46 +116,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body class="auth-page">
-  <div class="auth-container">
+  <div class="auth-container register-container">
     <div class="auth-card">
-      <h1>CropManage</h1>
-      <p class="subtitle">Create Your Account</p>
+      <div class="logo-section">
+
+        <h1>CropManage</h1>
+        <p class="subtitle">Create Your Account</p>
+      </div>
 
       <?php if ($error): ?>
         <div class="alert alert-error"><?php echo htmlspecialchars($error); ?></div>
       <?php endif; ?>
 
       <form method="POST" class="auth-form" id="registerForm">
-        <div class="form-group">
-          <label for="name">Full Name *</label>
-          <input type="text" id="name" name="name" required placeholder="Enter your full name" pattern="[a-zA-Z\s]{2,50}" title="Name should only contain letters and spaces (2-50 characters)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" name="name" required placeholder="Enter your full name" pattern="[a-zA-Z\s]{2,50}" title="Name should only contain letters and spaces (2-50 characters)">
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input type="email" id="email" name="email" required placeholder="Enter your email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address">
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="email">Email Address *</label>
-          <input type="email" id="email" name="email" required placeholder="Enter your email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" placeholder="10-digit phone number" pattern="[0-9]{10}" title="Phone number must be exactly 10 digits" maxlength="10">
+            <small style="color: #666; font-size: 0.85rem;">Optional: 10 digits only</small>
+          </div>
+
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" id="address" name="address" placeholder="Enter your address">
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <input type="tel" id="phone" name="phone" placeholder="Enter your 10-digit phone number" pattern="[0-9]{10}" title="Phone number must be exactly 10 digits" maxlength="10">
-          <small style="color: #666; font-size: 0.85rem;">Optional: 10 digits only</small>
-        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Password *</label>
+            <input type="password" id="password" name="password" required placeholder="At least 6 characters">
+            <small class="password-requirements">Must contain: uppercase, lowercase, and number (min 6 chars)</small>
+          </div>
 
-        <div class="form-group">
-          <label for="address">Address</label>
-          <input type="text" id="address" name="address" placeholder="Enter your address">
-        </div>
-
-        <div class="form-group">
-          <label for="password">Password *</label>
-          <input type="password" id="password" name="password" required placeholder="At least 6 characters">
-          <small class="password-requirements">Must contain: uppercase, lowercase, and number (min 6 chars)</small>
-        </div>
-
-        <div class="form-group">
-          <label for="confirm_password">Confirm Password *</label>
-          <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm your password">
+          <div class="form-group">
+            <label for="confirm_password">Confirm Password *</label>
+            <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm your password">
+          </div>
         </div>
 
         <button type="submit" class="btn btn-primary">Register</button>

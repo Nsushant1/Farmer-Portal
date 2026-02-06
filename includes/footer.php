@@ -1,4 +1,4 @@
-<footer id="contact">
+<footer>
   <div class="footer-content">
     <div class="footer-section">
       <h4>About CropManage</h4>
@@ -35,6 +35,7 @@
     <p>&copy; 2025 CropManage - Crop Management Portal. All rights reserved.</p>
   </div>
 </footer>
+
 </body>
 
 </html>
