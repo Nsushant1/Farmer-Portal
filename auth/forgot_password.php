@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../config/db_connection.php';
+require_once '../includes/email_helper.php';
 
 $error = '';
 $success = '';
@@ -33,15 +34,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_stmt_bind_param($update_stmt, 'sss', $token, $expiry, $email);
 
             if (mysqli_stmt_execute($update_stmt)) {
-                // In a real application, you would send an email here
-                // For now, we'll create a reset link and show it to the user
-                $reset_link = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/reset_password.php?token=" . $token;
+                // Generate reset link
+                $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+                $reset_link = $protocol . "://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/reset_password.php?token=" . $token;
 
-                // For demonstration purposes, we're showing the link
-                // In production, this should be sent via email
-                $success = "Password reset instructions have been sent to your email. <br><br>
-                   <strong>For testing purposes, click here:</strong><br>
-                   <a href='$reset_link' style='color: #2d5016; text-decoration: underline;'>Reset Password Link</a>";
+                // Send email
+                if (sendPasswordResetEmail($email, $user['name'], $reset_link)) {
+                    $success = 'Password reset instructions have been sent to your email address. Please check your inbox.';
+                } else {
+                    $error = 'Failed to send email. Please try again later or contact support.';
+                }
             } else {
                 $error = 'Error processing request. Please try again.';
             }
@@ -82,17 +84,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="alert alert-success"><?php echo $success; ?></div>
             <?php endif; ?>
 
-            <form method="POST" class="auth-form">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required placeholder="Enter your registered email">
-                    <small style="color: #666; font-size: 0.85rem; margin-top: 5px; display: block;">
-                        We'll send you a link to reset your password
-                    </small>
-                </div>
+            <?php if (!$success): ?>
+                <form method="POST" class="auth-form">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="Enter your registered email">
+                        <small style="color: #666; font-size: 0.85rem; margin-top: 5px; display: block;">
+                            We'll send you a link to reset your password
+                        </small>
+                    </div>
 
-                <button type="submit" class="btn btn-primary">Send Reset Link</button>
-            </form>
+                    <button type="submit" class="btn btn-primary">Send Reset Link</button>
+                </form>
+            <?php endif; ?>
 
             <div class="auth-footer">
                 <p>Remember your password? <a href="login.php">Login here</a></p>
@@ -101,4 +105,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </body>
 
-</html>     
+</html>
