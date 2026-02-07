@@ -6,7 +6,7 @@ $error = '';
 $success = '';
 
 // Check if admin already exists
-$check_admin = "SELECT COUNT(*) as admin_count FROM users WHERE is_admin = 1";
+$check_admin = "SELECT COUNT(*) as admin_count FROM users WHERE role = 'admin'";
 $result = mysqli_query($conn, $check_admin);
 $row = mysqli_fetch_assoc($result);
 
@@ -54,9 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Create admin user
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $insert_query = "INSERT INTO users (name, email, password, is_admin) VALUES (?, ?, ?, 1)";
+            $role = 'admin';
+            $status = 'active';
+
+            $insert_query = "INSERT INTO users (name, email, password, role, status) VALUES (?, ?, ?, ?, ?)";
             $insert_stmt = mysqli_prepare($conn, $insert_query);
-            mysqli_stmt_bind_param($insert_stmt, 'sss', $name, $email, $hashed_password);
+            mysqli_stmt_bind_param($insert_stmt, 'sssss', $name, $email, $hashed_password, $role, $status);
 
             if (mysqli_stmt_execute($insert_stmt)) {
                 $success = 'Admin account created successfully! Redirecting to login...';

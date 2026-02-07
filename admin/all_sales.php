@@ -11,14 +11,14 @@ require_once '../config/db_connection.php';
 $user_id = $_SESSION['user_id'];
 
 // Check if user is admin
-$admin_check = "SELECT is_admin, name FROM users WHERE id = ?";
+$admin_check = "SELECT role, name FROM users WHERE id = ?";
 $stmt = mysqli_prepare($conn, $admin_check);
 mysqli_stmt_bind_param($stmt, 'i', $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $user = mysqli_fetch_assoc($result);
 
-if (!$user || $user['is_admin'] != 1) {
+if (!$user || $user['role'] !== 'admin') {
     header('Location: ../dashboard/index.php');
     exit;
 }

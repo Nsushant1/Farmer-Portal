@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (empty($email) || empty($password)) {
     $error = 'Please fill in all fields';
   } else {
-    $query = "SELECT id, email, password, name, is_admin FROM users WHERE email = ?";
+    $query = "SELECT id, email, password, name, role, status FROM users WHERE email = ?";
     $stmt = mysqli_prepare($conn, $query);
     mysqli_stmt_bind_param($stmt, 's', $email);
     mysqli_stmt_execute($stmt);
@@ -26,16 +26,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (mysqli_num_rows($result) === 1) {
       $user = mysqli_fetch_assoc($result);
       if (password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_email'] = $user['email'];
-        $_SESSION['user_name'] = $user['name'];
-        // Check if admin and redirect accordingly
-        if ($user['is_admin'] == 1) {
-          header('Location: ../admin/dashboard.php');
+        // Check if user is blocked
+        $status = $user['status'] ?? 'active';
+        if ($status == 'blocked') {
+          $error = 'Your account has been blocked. Please contact the administrator.';
         } else {
-          header('Location: ../dashboard/index.php');
+          $_SESSION['user_id'] = $user['id'];
+          $_SESSION['user_email'] = $user['email'];
+          $_SESSION['user_name'] = $user['name'];
+          // Check if admin and redirect accordingly
+          if ($user['role'] === 'admin') {
+            header('Location: ../admin/dashboard.php');
+          } else {
+            header('Location: ../dashboard/index.php');
+          }
+          exit;
         }
-        exit;
       } else {
         $error = 'Invalid email or password';
       }

@@ -11,14 +11,14 @@ require_once '../config/db_connection.php';
 $user_id = $_SESSION['user_id'];
 
 // Check if user is admin
-$admin_check = "SELECT is_admin, name FROM users WHERE id = ?";
+$admin_check = "SELECT role, name FROM users WHERE id = ?";
 $stmt = mysqli_prepare($conn, $admin_check);
 mysqli_stmt_bind_param($stmt, 'i', $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $user = mysqli_fetch_assoc($result);
 
-if (!$user || $user['is_admin'] != 1) {
+if (!$user || $user['role'] !== 'admin') {
     header('Location: ../dashboard/index.php');
     exit;
 }
@@ -88,7 +88,7 @@ $user_name = $user['name'] ?? 'Admin';
         <!-- Stats Grid -->
         <div class="stats-grid">
             <?php
-            $users_query = "SELECT COUNT(*) as total_users FROM users WHERE is_admin = 0";
+            $users_query = "SELECT COUNT(*) as total_users FROM users WHERE role = 'user'";
             $users_result = mysqli_query($conn, $users_query);
             $users_data = mysqli_fetch_assoc($users_result);
 
@@ -156,7 +156,7 @@ $user_name = $user['name'] ?? 'Admin';
 
         <!-- Recent Users Table -->
         <?php
-        $recent_users = "SELECT name, email, created_at FROM users WHERE is_admin = 0 ORDER BY created_at DESC LIMIT 10";
+        $recent_users = "SELECT name, email, created_at FROM users WHERE role = 'user' ORDER BY created_at DESC LIMIT 10";
         $recent_result = mysqli_query($conn, $recent_users);
         $user_count = mysqli_num_rows($recent_result);
         ?>

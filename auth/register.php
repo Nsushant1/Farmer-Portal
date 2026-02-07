@@ -39,9 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $error = 'Email already registered';
     } else {
       $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-      $insert_query = "INSERT INTO users (name, email, password, phone, address) VALUES (?, ?, ?, ?, ?)";
+      $role = 'user'; // Default role for new registrations
+      $status = 'active'; // Default status
+
+      $insert_query = "INSERT INTO users (name, email, password, phone, address, role, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
       $insert_stmt = mysqli_prepare($conn, $insert_query);
-      mysqli_stmt_bind_param($insert_stmt, 'sssss', $name, $email, $hashed_password, $phone, $address);
+      mysqli_stmt_bind_param($insert_stmt, 'sssssss', $name, $email, $hashed_password, $phone, $address, $role, $status);
 
       if (mysqli_stmt_execute($insert_stmt)) {
         header('Location: login.php?success=1');
