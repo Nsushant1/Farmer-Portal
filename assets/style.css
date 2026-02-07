@@ -763,14 +763,16 @@ footer {
 
 .auth-card h1 {
   text-align: center;
-  color: #2d5016;
+  color: #000000;
+  /* CHANGED TO BLACK */
   margin-bottom: 5px;
   font-size: 32px;
 }
 
 .auth-card .subtitle {
   text-align: center;
-  color: var(--text-secondary);
+  color: #000000;
+  /* CHANGED TO BLACK */
   margin-bottom: 30px;
   font-size: 14px;
 }
@@ -786,7 +788,8 @@ footer {
 .auth-form .form-group label {
   font-weight: 600;
   margin-bottom: 8px;
-  color: #2d5016;
+  color: #000000;
+  /* CHANGED TO BLACK */
   font-size: 14px;
   display: block;
 }
@@ -801,6 +804,13 @@ footer {
   font-size: 14px;
   transition: all 0.3s ease;
   width: 100%;
+  color: #000000;
+  /* CHANGED TO BLACK - for input text */
+}
+
+.auth-form .form-group input::placeholder {
+  color: #666666;
+  /* Placeholder text color */
 }
 
 .auth-form .form-group input:focus,
@@ -853,7 +863,8 @@ footer {
 
 .auth-footer p {
   margin-bottom: 0;
-  color: var(--text-secondary);
+  color: #000000;
+  /* CHANGED TO BLACK */
   font-size: 14px;
 }
 
@@ -876,10 +887,14 @@ footer {
   margin-top: 15px;
   font-size: 13px;
   border-left: 4px solid #2d5016;
+  color: #000000;
+  /* CHANGED TO BLACK */
 }
 
 .demo-credentials p {
   margin: 5px 0;
+  color: #000000;
+  /* CHANGED TO BLACK */
 }
 
 /* Alerts */

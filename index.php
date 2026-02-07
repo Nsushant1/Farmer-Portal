@@ -49,7 +49,7 @@ require_once 'includes/navbar-landing.php';
           <i class="fa fa-bar-chart"></i>
         </div>
         <h3>Detailed Reports</h3>
-        <p>Generate comprehensive CSV reports for analysis and record keeping</p>
+        <p>View comprehensive reports for analysis and record keeping</p>
       </div>
     </div>
   </div>
