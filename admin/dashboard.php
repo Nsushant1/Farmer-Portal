@@ -88,7 +88,7 @@ $user_name = $user['name'] ?? 'Admin';
         <!-- Stats Grid -->
         <div class="stats-grid">
             <?php
-            $users_query = "SELECT COUNT(*) as total_users FROM users WHERE role = 'user'";
+            $users_query = "SELECT COUNT(*) as total_users FROM users WHERE role = 'farmer'";
             $users_result = mysqli_query($conn, $users_query);
             $users_data = mysqli_fetch_assoc($users_result);
 
@@ -156,7 +156,7 @@ $user_name = $user['name'] ?? 'Admin';
 
         <!-- Recent Users Table -->
         <?php
-        $recent_users = "SELECT name, email, created_at FROM users WHERE role = 'user' ORDER BY created_at DESC LIMIT 10";
+        $recent_users = "SELECT name, email, created_at FROM users WHERE role = 'farmer' ORDER BY created_at DESC LIMIT 10";
         $recent_result = mysqli_query($conn, $recent_users);
         $user_count = mysqli_num_rows($recent_result);
         ?>

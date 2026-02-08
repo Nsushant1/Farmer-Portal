@@ -28,7 +28,7 @@ $user_name = $user['name'] ?? 'Admin';
 // Handle user blocking
 if (isset($_GET['block']) && is_numeric($_GET['block'])) {
     $block_id = intval($_GET['block']);
-    $block_query = "UPDATE users SET status = 'blocked' WHERE id = ? AND role = 'user'";
+    $block_query = "UPDATE users SET status = 'blocked' WHERE id = ? AND role = 'farmer'";
     $block_stmt = mysqli_prepare($conn, $block_query);
     mysqli_stmt_bind_param($block_stmt, 'i', $block_id);
     mysqli_stmt_execute($block_stmt);
@@ -40,7 +40,7 @@ if (isset($_GET['block']) && is_numeric($_GET['block'])) {
 // Handle user unblocking
 if (isset($_GET['unblock']) && is_numeric($_GET['unblock'])) {
     $unblock_id = intval($_GET['unblock']);
-    $unblock_query = "UPDATE users SET status = 'active' WHERE id = ? AND role = 'user'";
+    $unblock_query = "UPDATE users SET status = 'active' WHERE id = ? AND role = 'farmer'";
     $unblock_stmt = mysqli_prepare($conn, $unblock_query);
     mysqli_stmt_bind_param($unblock_stmt, 'i', $unblock_id);
     mysqli_stmt_execute($unblock_stmt);
@@ -125,7 +125,7 @@ if (isset($_GET['unblock']) && is_numeric($_GET['unblock'])) {
         <div class="table-section">
             <div class="table-wrapper">
                 <?php
-                $users_query = "SELECT id, name, email, phone, address, status, created_at FROM users WHERE role = 'user' ORDER BY created_at DESC";
+                $users_query = "SELECT id, name, email, phone, address, status, created_at FROM users WHERE role = 'farmer' ORDER BY created_at DESC";
                 $users_result = mysqli_query($conn, $users_query);
 
                 if (mysqli_num_rows($users_result) > 0):
