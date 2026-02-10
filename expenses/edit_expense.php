@@ -1,5 +1,7 @@
 <?php
-require_once '../config/db_connection.php';
+$page_title = 'Edit Expense - CropManage';
+$css_path = '../assets/style.css';
+$base_path = '../';
 require_once '../includes/header.php';
 
 $expense_id = intval($_GET['id'] ?? 0);
@@ -26,18 +28,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $amount = floatval($_POST['amount'] ?? 0);
   $expense_date = $_POST['expense_date'] ?? '';
   $description = mysqli_real_escape_string($conn, $_POST['description'] ?? '');
-  $receipt_notes = mysqli_real_escape_string($conn, $_POST['receipt_notes'] ?? '');
+  $notes = mysqli_real_escape_string($conn, $_POST['notes'] ?? '');
 
-  if (empty($crop_id) || empty($expense_category) || empty($amount) || empty($expense_date)) {
+  if (empty($expense_category) || empty($amount) || empty($expense_date)) {
     $error = 'Please fill in all required fields';
   } else {
-    $update_query = "UPDATE expenses SET crop_id = ?, expense_category = ?, amount = ?, expense_date = ?, description = ?, receipt_notes = ? WHERE id = ? AND user_id = ?";
+    // Allow crop_id to be NULL for general expenses
+    $crop_id_value = ($crop_id > 0) ? $crop_id : NULL;
+
+    $update_query = "UPDATE expenses SET crop_id = ?, expense_category = ?, amount = ?, expense_date = ?, description = ?, notes = ? WHERE id = ? AND user_id = ?";
     $update_stmt = mysqli_prepare($conn, $update_query);
-    mysqli_stmt_bind_param($update_stmt, 'isdsssii', $crop_id, $expense_category, $amount, $expense_date, $description, $receipt_notes, $expense_id, $user_id);
+    mysqli_stmt_bind_param($update_stmt, 'isdsssii', $crop_id_value, $expense_category, $amount, $expense_date, $description, $notes, $expense_id, $user_id);
 
     if (mysqli_stmt_execute($update_stmt)) {
-      $success = 'Expense updated successfully!';
-      header('Location: ' . BASE_URL . 'expenses/manage_expenses.php?success=1');
+      mysqli_stmt_close($update_stmt);
+      header('Location: manage_expenses.php?updated=1');
       exit;
     } else {
       $error = 'Error updating expense. Please try again.';
@@ -46,15 +51,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 
-// Get user's crops for dropdown
+// Get user's crops for the dropdown
 $crops_query = "SELECT id, crop_name FROM crops WHERE user_id = ? ORDER BY crop_name";
 $crops_stmt = mysqli_prepare($conn, $crops_query);
 mysqli_stmt_bind_param($crops_stmt, 'i', $user_id);
 mysqli_stmt_execute($crops_stmt);
 $crops_result = mysqli_stmt_get_result($crops_stmt);
-?>
 
-<?php require_once '../includes/navbar.php'; ?>
+require_once '../includes/navbar.php';
+?>
 
 <main class="form-container">
   <div class="form-card">
@@ -67,19 +72,21 @@ $crops_result = mysqli_stmt_get_result($crops_stmt);
     <form method="POST" class="expense-form">
       <div class="form-row">
         <div class="form-group">
-          <label for="crop_id">Select Crop *</label>
-          <select id="crop_id" name="crop_id" required>
-            <option value="">Choose a crop</option>
+          <label for="crop_id">Select Crop</label>
+          <select id="crop_id" name="crop_id">
+            <option value="">General Expense (Not crop-specific)</option>
             <?php while ($crop = mysqli_fetch_assoc($crops_result)): ?>
-              <option value="<?php echo $crop['id']; ?>" <?php echo $crop['id'] === $expense['crop_id'] ? 'selected' : ''; ?>>
+              <option value="<?php echo $crop['id']; ?>" <?php echo $crop['id'] == $expense['crop_id'] ? 'selected' : ''; ?>>
                 <?php echo htmlspecialchars($crop['crop_name']); ?>
               </option>
             <?php endwhile; ?>
           </select>
+          <small style="color: #666; font-size: 0.85rem;">Optional: Leave blank for general farm expenses</small>
         </div>
         <div class="form-group">
           <label for="expense_category">Expense Category *</label>
           <select id="expense_category" name="expense_category" required>
+            <option value="">Select Category</option>
             <option value="Seeds" <?php echo $expense['expense_category'] === 'Seeds' ? 'selected' : ''; ?>>Seeds</option>
             <option value="Fertilizer" <?php echo $expense['expense_category'] === 'Fertilizer' ? 'selected' : ''; ?>>Fertilizer</option>
             <option value="Pesticide" <?php echo $expense['expense_category'] === 'Pesticide' ? 'selected' : ''; ?>>Pesticide</option>
@@ -88,6 +95,8 @@ $crops_result = mysqli_stmt_get_result($crops_stmt);
             <option value="Irrigation" <?php echo $expense['expense_category'] === 'Irrigation' ? 'selected' : ''; ?>>Irrigation</option>
             <option value="Transportation" <?php echo $expense['expense_category'] === 'Transportation' ? 'selected' : ''; ?>>Transportation</option>
             <option value="Storage" <?php echo $expense['expense_category'] === 'Storage' ? 'selected' : ''; ?>>Storage</option>
+            <option value="Maintenance" <?php echo $expense['expense_category'] === 'Maintenance' ? 'selected' : ''; ?>>Maintenance</option>
+            <option value="Utilities" <?php echo $expense['expense_category'] === 'Utilities' ? 'selected' : ''; ?>>Utilities</option>
             <option value="Other" <?php echo $expense['expense_category'] === 'Other' ? 'selected' : ''; ?>>Other</option>
           </select>
         </div>
@@ -95,28 +104,28 @@ $crops_result = mysqli_stmt_get_result($crops_stmt);
 
       <div class="form-row">
         <div class="form-group">
-          <label for="amount">Amount (₹) *</label>
-          <input type="number" id="amount" name="amount" required step="0.01" value="<?php echo $expense['amount']; ?>">
+          <label for="amount">Amount (Rs.) *</label>
+          <input type="number" id="amount" name="amount" required step="0.01" placeholder="e.g., 5000.50" min="0" value="<?php echo htmlspecialchars($expense['amount']); ?>">
         </div>
         <div class="form-group">
           <label for="expense_date">Expense Date *</label>
-          <input type="date" id="expense_date" name="expense_date" required value="<?php echo $expense['expense_date']; ?>">
+          <input type="date" id="expense_date" name="expense_date" required max="<?php echo date('Y-m-d'); ?>" value="<?php echo htmlspecialchars($expense['expense_date']); ?>">
         </div>
       </div>
 
       <div class="form-group full-width">
         <label for="description">Description</label>
-        <textarea id="description" name="description"><?php echo htmlspecialchars($expense['description'] ?? ''); ?></textarea>
+        <textarea id="description" name="description" placeholder="Add details about this expense" rows="3"><?php echo htmlspecialchars($expense['description'] ?? ''); ?></textarea>
       </div>
 
       <div class="form-group full-width">
-        <label for="receipt_notes">Receipt Notes</label>
-        <input type="text" id="receipt_notes" name="receipt_notes" value="<?php echo htmlspecialchars($expense['receipt_notes'] ?? ''); ?>">
+        <label for="notes">Additional Notes</label>
+        <textarea id="notes" name="notes" placeholder="Receipt number, vendor info, or other notes" rows="2"><?php echo htmlspecialchars($expense['notes'] ?? ''); ?></textarea>
       </div>
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">Update Expense</button>
-        <a href="<?php echo BASE_URL; ?>expenses/manage_expenses.php" class="btn btn-secondary">Cancel</a>
+        <a href="manage_expenses.php" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
   </div>

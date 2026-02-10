@@ -14,20 +14,17 @@
       </ul>
     </div>
     <div class="footer-section">
-      <h4>Support</h4>
-      <ul>
-        <li><a href="#">FAQ</a></li>
-        <li><a href="#">Help Center</a></li>
-        <li><a href="#">Contact Us</a></li>
-        <li><a href="#">Documentation</a></li>
-      </ul>
-    </div>
-    <div class="footer-section">
       <h4>Legal</h4>
       <ul>
         <li><a href="#">Privacy Policy</a></li>
         <li><a href="#">Terms of Service</a></li>
-        <li><a href="#">Cookie Policy</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Contact Us</h4>
+      <ul>
+        <li>✉ nsushaant72@gmail.com</li>
+        <li>📞 9862648850</li>
       </ul>
     </div>
   </div>

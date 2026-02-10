@@ -5,21 +5,21 @@ $base_path = '../';
 require_once '../includes/header.php';
 require_once '../includes/navbar.php';
 ?>
-
 <main class="manage-section">
   <div class="section-header">
     <h1>Manage Expenses</h1>
     <a href="add_expense.php" class="btn btn-success">+ Add New Expense</a>
   </div>
-
   <?php
   if (isset($_GET['success'])) {
     echo '<div class="alert alert-success">Expense added successfully!</div>';
   }
+  if (isset($_GET['updated'])) {
+    echo '<div class="alert alert-success">Expense updated successfully!</div>';
+  }
   if (isset($_GET['deleted'])) {
     echo '<div class="alert alert-success">Expense deleted successfully!</div>';
   }
-
   $query = "SELECT e.*, c.crop_name
             FROM expenses e
             LEFT JOIN crops c ON e.crop_id = c.id
@@ -29,7 +29,6 @@ require_once '../includes/navbar.php';
   mysqli_stmt_bind_param($stmt, 'i', $user_id);
   mysqli_stmt_execute($stmt);
   $result = mysqli_stmt_get_result($stmt);
-
   if (mysqli_num_rows($result) > 0):
   ?>
     <div class="table-container">
@@ -57,6 +56,7 @@ require_once '../includes/navbar.php';
               <td><?php echo htmlspecialchars($expense['description'] ?: '-'); ?></td>
               <td class="amount">Rs. <?php echo number_format($expense['amount'], 2); ?></td>
               <td class="action-column">
+                <a href="edit_expense.php?id=<?php echo $expense['id']; ?>" class="action-btn edit">Edit</a>
                 <a href="delete_expense.php?id=<?php echo $expense['id']; ?>" class="action-btn delete" onclick="return confirm('Are you sure you want to delete this expense?');">Delete</a>
               </td>
             </tr>
@@ -76,5 +76,4 @@ require_once '../includes/navbar.php';
   mysqli_stmt_close($stmt);
   ?>
 </main>
-
 <?php require_once '../includes/footer.php'; ?>
