@@ -44,9 +44,6 @@ $user_name = $user['name'] ?? 'Admin';
         <!-- TOP ROW -->
         <div class="admin-navbar-row">
             <div class="admin-brand">
-                <div class="admin-brand-icon">
-                    <i class="fa-solid fa-leaf"></i>
-                </div>
                 <div class="admin-brand-text">
                     <h1>CropManage</h1>
                     <span>Admin Panel</span>

@@ -21,13 +21,14 @@
         }
         $initials = substr($initials, 0, 2);
         ?>
-        <div class="user-avatar" title="<?php echo htmlspecialchars($user_name); ?>"><?php echo $initials; ?></div>
+        <a href="<?php echo isset($base_path) ? $base_path : '../'; ?>profile/profile.php" class="user-avatar-link" title="<?php echo htmlspecialchars($user_name); ?>">
+          <div class="user-avatar"><?php echo $initials; ?></div>
+        </a>
         <a href="#" class="btn btn-primary" onclick="showLogoutModal(); return false;">Logout</a>
       </div>
     </ul>
   </div>
 </nav>
-
 <!-- Logout Confirmation Modal -->
 <div id="logoutModal" class="modal">
   <div class="modal-content">
@@ -43,8 +44,23 @@
     </div>
   </div>
 </div>
-
 <style>
+  /* User Avatar Link Styles */
+  .user-avatar-link {
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+
+  .user-avatar-link:hover {
+    transform: scale(1.05);
+  }
+
+  .user-avatar-link:hover .user-avatar {
+    background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+  }
+
   /* Logout Modal Styles */
   .modal {
     display: none;
@@ -130,7 +146,6 @@
     }
   }
 </style>
-
 <script>
   function showLogoutModal() {
     document.getElementById('logoutModal').classList.add('show');
@@ -139,7 +154,6 @@
   function hideLogoutModal() {
     document.getElementById('logoutModal').classList.remove('show');
   }
-
   // Close modal when clicking outside
   window.onclick = function(event) {
     const modal = document.getElementById('logoutModal');
@@ -147,7 +161,6 @@
       hideLogoutModal();
     }
   }
-
   // Close modal with Escape key
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {

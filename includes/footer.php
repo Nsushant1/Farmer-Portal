@@ -16,8 +16,8 @@
     <div class="footer-section">
       <h4>Legal</h4>
       <ul>
-        <li><a href="#">Privacy Policy</a></li>
-        <li><a href="#">Terms of Service</a></li>
+        <li><a href="<?php echo isset($base_path) ? $base_path . 'privacy/privacy-terms.php' : '../privacy/privacy-terms.php'; ?>">Privacy Policy</a></li>
+        <li><a href="<?php echo isset($base_path) ? $base_path . 'privacy/privacy-terms.php' : '../privacy/terms-of-service.php'; ?>">Terms of Service</a></li>
       </ul>
     </div>
     <div class="footer-section">
