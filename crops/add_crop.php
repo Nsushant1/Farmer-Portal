@@ -54,13 +54,9 @@ require_once '../includes/navbar.php';
           <label for="crop_type">Crop Type *</label>
           <select id="crop_type" name="crop_type" required>
             <option value="">Select Crop Type</option>
-            <option value="Wheat">Wheat</option>
-            <option value="Rice">Rice</option>
-            <option value="Cotton">Cotton</option>
-            <option value="Corn">Corn</option>
-            <option value="Sugarcane">Sugarcane</option>
+            <option value="Grains">Wheat</option>
+            <option value="Vegetable">Rice</option>
             <option value="Pulses">Pulses</option>
-            <option value="Vegetables">Vegetables</option>
             <option value="Fruits">Fruits</option>
             <option value="Other">Other</option>
           </select>
